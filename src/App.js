@@ -10,6 +10,16 @@ function createRandomPost() {
 
 //1. create a context
 const PostContext = createContext();
+const ButtonContext = createContext();
+
+function useFakeDark(isFakeDark) {
+  useEffect(
+    function () {
+      document.documentElement.classList.toggle("fake-dark-mode");
+    },
+    [isFakeDark],
+  );
+}
 
 function App() {
   const [posts, setPosts] = useState(() =>
@@ -37,12 +47,7 @@ function App() {
   }
 
   // Whenever `isFakeDark` changes, we toggle the `fake-dark-mode` class on the HTML element (see in "Elements" dev tool).
-  useEffect(
-    function () {
-      document.documentElement.classList.toggle("fake-dark-mode");
-    },
-    [isFakeDark],
-  );
+  useFakeDark(isFakeDark);
 
   return (
     //2. Provide a value to child components
@@ -57,12 +62,14 @@ function App() {
       }}
     >
       <section>
-        <button
-          onClick={() => setIsFakeDark((isFakeDark) => !isFakeDark)}
-          className="btn-fake-dark-mode"
+        <ButtonContext.Provider
+          value={{
+            setIsFakeDark,
+            isFakeDark,
+          }}
         >
-          {isFakeDark ? "☀️" : "🌙"}
-        </button>
+          <Button />
+        </ButtonContext.Provider>
 
         <Header />
         <Main />
@@ -70,6 +77,19 @@ function App() {
         <Footer />
       </section>
     </PostContext.Provider>
+  );
+}
+
+function Button() {
+  const { isFakeDark, setIsFakeDark } = useContext(ButtonContext);
+
+  return (
+    <button
+      onClick={() => setIsFakeDark((isFakeDark) => !isFakeDark)}
+      className="btn-fake-dark-mode"
+    >
+      {isFakeDark ? "☀️" : "🌙"}
+    </button>
   );
 }
 
